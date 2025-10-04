@@ -17,5 +17,8 @@
   "scripts": {
     "test": "node server.js",
     "start": "node server.js"
+  },
+  "dependencies": {
+    "@google/genai": "^1.22.0"
   }
 }
