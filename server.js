@@ -18,29 +18,26 @@ function generateRoomCode() {
   return randomBytes(2).toString('hex').toUpperCase();
 }
 
-// ----- SOCKET.IO -----
+// --- SOCKET.IO HANDLERS (same as before) ---
 io.on('connection', (socket) => {
-  console.log('Connected:', socket.id);
-
   socket.on('create room', (username, callback) => {
     const room = generateRoomCode();
     socket.join(room);
     users[socket.id] = { username, room };
     roomMessages[room] = [];
-    console.log(`${username} created room ${room}`);
     callback(room);
   });
 
   socket.on('join room', (username, room, callback) => {
-    if (!io.sockets.adapter.rooms.has(room)) {
-      callback({ success: false, message: 'Room not found' });
-      return;
+    if (!roomMessages[room]) {
+      roomMessages[room] = []; // create the room if it doesn’t exist
     }
     socket.join(room);
     users[socket.id] = { username, room };
     io.to(room).emit('system', `${username} joined ${room}`);
     callback({ success: true });
   });
+
 
   socket.on('chat message', (msg) => {
     const user = users[socket.id];
@@ -60,44 +57,54 @@ io.on('connection', (socket) => {
   });
 });
 
-// ----- EXPRESS API -----
+// --- REST API ROUTES ---
+// 1. Create Room (external apps)
+app.post('/api/createRoom', (req, res) => {
+  const { username } = req.body;
+  if (!username) return res.status(400).json({ error: 'Missing username' });
+
+  const room = generateRoomCode();
+  roomMessages[room] = [];
+  res.json({ room, username });
+});
+
+// 2. Join Room (optional for external apps if needed)
+app.post('/api/joinRoom', (req, res) => {
+  const { username, room } = req.body;
+  if (!username || !room) return res.status(400).json({ error: 'Missing username or room' });
+  if (!roomMessages[room]) return res.status(404).json({ error: 'Room not found' });
+
+  res.json({ success: true, room });
+});
+
+// 3. Send message
 app.post('/api/send', (req, res) => {
   const { room, user, text } = req.body;
-  if (!room || !text) {
-    return res.status(400).json({ error: 'Missing room or text' });
-  }
-  if (!io.sockets.adapter.rooms.has(room)) {
-    return res.status(404).json({ error: 'Room not found' });
-  }
+  if (!room || !text) return res.status(400).json({ error: 'Missing room or text' });
+  if (!roomMessages[room]) return res.status(404).json({ error: 'Room not found' });
+
   const message = { user: user || 'API Bot 🤖', text };
   io.to(room).emit('chat message', message);
-  if (!roomMessages[room]) roomMessages[room] = [];
   roomMessages[room].push(message);
   res.json({ success: true, delivered: true });
 });
 
+// 4. Get messages (latest per user optional)
 app.get('/api/rooms/:room', (req, res) => {
   const room = req.params.room;
+  const latest = req.query.latest === 'true'; // ?latest=true
   const messages = roomMessages[room];
 
-  if (!messages) {
-    return res.status(404).json({ error: 'Room not found' });
+  if (!messages) return res.status(404).json({ error: 'Room not found' });
+
+  if (latest) {
+    const latestByUser = new Map();
+    for (const msg of messages) latestByUser.set(msg.user, msg);
+    return res.json({ room, messages: Array.from(latestByUser.values()) });
   }
 
-  // Map to store most recent message per user
-  const latestByUser = new Map();
-
-  // Loop through messages in order and overwrite older ones
-  for (const msg of messages) {
-    latestByUser.set(msg.user, msg);
-  }
-
-  // Convert Map back to an array
-  const latestMessages = Array.from(latestByUser.values());
-
-  res.json({ room, messages: latestMessages });
+  res.json({ room, messages });
 });
 
-
 const PORT = 3000;
-server.listen(PORT, () => console.log(`✅ Server running at http://localhost:${PORT}`));
+server.listen(PORT, () => console.log(`Server running at http://localhost:${PORT}`));
