@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>Named Chat 💬</title>
+    <title>Room Chat 💬</title>
     <style>
       body { font-family: Arial; padding: 20px; }
-      #chat { display: none; }
+      #chat, #join-room { display: none; }
       ul { list-style: none; padding: 0; }
       li { margin: 5px 0; background: #eee; padding: 8px; border-radius: 4px; }
       .system { color: gray; font-style: italic; }
@@ -12,14 +12,21 @@
     </style>
   </head>
   <body>
-    <h2>Chat Room 💬</h2>
+    <h2>Room Chat 💬</h2>
 
-    <div id="login">
+    <div id="start">
       <input id="username" placeholder="Enter your name" />
-      <button id="join">Join</button>
+      <button id="create">Create Room</button>
+      <button id="join">Join Room</button>
+    </div>
+
+    <div id="join-room">
+      <input id="roomCode" placeholder="Enter room code" />
+      <button id="joinRoomBtn">Join</button>
     </div>
 
     <div id="chat">
+      <h3 id="roomHeader"></h3>
       <ul id="messages"></ul>
       <form id="form">
         <input id="input" autocomplete="off" placeholder="Type message..." />
@@ -30,24 +37,54 @@
     <script src="/socket.io/socket.io.js"></script>
     <script>
       const socket = io();
-      const loginDiv = document.getElementById('login');
+
+      const startDiv = document.getElementById('start');
+      const joinRoomDiv = document.getElementById('join-room');
       const chatDiv = document.getElementById('chat');
       const usernameInput = document.getElementById('username');
-      const joinBtn = document.getElementById('join');
+      const roomCodeInput = document.getElementById('roomCode');
+      const roomHeader = document.getElementById('roomHeader');
+      const messages = document.getElementById('messages');
       const form = document.getElementById('form');
       const input = document.getElementById('input');
-      const messages = document.getElementById('messages');
 
       let username = '';
+      let roomCode = '';
 
-      joinBtn.addEventListener('click', () => {
+      document.getElementById('create').addEventListener('click', () => {
         username = usernameInput.value.trim();
         if (username) {
-          socket.emit('set username', username);
-          loginDiv.style.display = 'none';
-          chatDiv.style.display = 'block';
+          socket.emit('create room', username, (code) => {
+            roomCode = code;
+            showChat(`You created room: ${roomCode}`);
+          });
         }
       });
+
+      document.getElementById('join').addEventListener('click', () => {
+        joinRoomDiv.style.display = 'block';
+      });
+
+      document.getElementById('joinRoomBtn').addEventListener('click', () => {
+        username = usernameInput.value.trim();
+        roomCode = roomCodeInput.value.trim().toUpperCase();
+        if (username && roomCode) {
+          socket.emit('join room', username, roomCode, (response) => {
+            if (response.success) {
+              showChat(`Joined room: ${roomCode}`);
+            } else {
+              alert(response.message);
+            }
+          });
+        }
+      });
+
+      function showChat(title) {
+        startDiv.style.display = 'none';
+        joinRoomDiv.style.display = 'none';
+        chatDiv.style.display = 'block';
+        roomHeader.textContent = title;
+      }
 
       form.addEventListener('submit', (e) => {
         e.preventDefault();
@@ -63,14 +100,7 @@
         messages.appendChild(li);
       });
 
-      socket.on('user joined', (msg) => {
-        const li = document.createElement('li');
-        li.textContent = msg;
-        li.classList.add('system');
-        messages.appendChild(li);
-      });
-
-      socket.on('user left', (msg) => {
+      socket.on('system', (msg) => {
         const li = document.createElement('li');
         li.textContent = msg;
         li.classList.add('system');

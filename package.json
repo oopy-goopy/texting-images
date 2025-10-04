@@ -1,0 +1,21 @@
+{
+  "name": "project-meteion",
+  "version": "1.0.0",
+  "description": "yup",
+  "homepage": "https://github.com/oopy-goopy/texting-images#readme",
+  "bugs": {
+    "url": "https://github.com/oopy-goopy/texting-images/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/oopy-goopy/texting-images.git"
+  },
+  "license": "ISC",
+  "author": "us",
+  "type": "commonjs",
+  "main": "server.js",
+  "scripts": {
+    "test": "node server.js",
+    "start": "node server.js"
+  }
+}
