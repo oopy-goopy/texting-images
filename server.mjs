@@ -115,6 +115,24 @@ app.get('/api/rooms/:room', (req, res) => {
   res.json({ room, messages });
 });
 
+app.post('/api/describe', async (req, res) => {
+  const { room, arr, lang, user } = req.body;
+  if (!room || !arr || !lang || !user) return res.status(400).json({ error: 'Missing room, arr, lang, or user' });
+  if (!roomMessages[room]) return res.status(404).json({ error: 'Room not found' });
+
+  try {
+    const sentence = await describe(arr, lang);
+    const message = { user, text: sentence };
+    io.to(room).emit('chat message', message);
+    roomMessages[room].push(message);
+    res.json({ success: true, sentence });
+  } catch (err) {
+    res.status(500).json({ error: 'Describe failed', details: err.message });
+  }
+});
+
+
+
 const PORT = 443;
 
 // Always bind to 0.0.0.0 (not localhost)
