@@ -48,9 +48,8 @@ io.on('connection', (socket) => {
     if (user && user.room) {
         console.log(msg);
         if (msg == "a great big tree") {
-            const funnyaeaea = describe(["tree", "big", "great"], "English");
-            sleep(10000);
-            console.log(funnyaeaea);}
+            describe(["tree", "big", "great"], "English").then(result => console.log(result));
+            }
       const payload = { user: user.username, text: msg };
       io.to(user.room).emit('chat message', payload);
       roomMessages[user.room].push(payload);
