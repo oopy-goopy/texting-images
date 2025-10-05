@@ -111,4 +111,4 @@ app.get('/api/rooms/:room', (req, res) => {
 const PORT = 443;
 
 // Always bind to 0.0.0.0 (not localhost)
-server.listen(PORT, "0.0.0.0", () => console.log(`Server running`));
+server.listen(PORT, "0.0.0.0", () => console.log(`Server running on port ${PORT}`));
