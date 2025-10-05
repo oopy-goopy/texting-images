@@ -108,7 +108,7 @@ app.get('/api/rooms/:room', (req, res) => {
   res.json({ room, messages });
 });
 
-const PORT = 8080;
+const PORT = 443;
 
 // Always bind to 0.0.0.0 (not localhost)
 server.listen(PORT, "0.0.0.0", () => console.log(`Server running`));
