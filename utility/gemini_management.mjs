@@ -13,7 +13,7 @@ export async function describe(arr, lang) {
     Note: The words in the array does not need to be in the sentence.
     Language: ${lang}`;
     const response = await ai.models.generateContent({
-        model: "gemini-2.5-flash",
+        model: "gemini-2.5-flash-lite",
         contents: prompt
     });
     return response.text;
