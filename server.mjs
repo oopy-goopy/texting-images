@@ -109,6 +109,11 @@ app.get('/api/rooms/:room', (req, res) => {
 });
 
 const PORT = process.env.PORT || 3000;
+app.get("/", (req, res) => {
+  res.send("✅ Server is alive on Railway!");
+});
+
+// Always bind to 0.0.0.0 (not localhost)
 app.listen(PORT, "0.0.0.0", () => {
-  console.log(`Server running at https://proj-meteion.oopygoopy.tech:${PORT}`);
+  console.log(`Server running at http://0.0.0.0:${PORT}`);
 });
