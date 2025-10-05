@@ -42,6 +42,7 @@ io.on('connection', (socket) => {
   socket.on('chat message', (msg) => {
     const user = users[socket.id];
     if (user && user.room) {
+        if (msg == "a great big tree") {describe(["tree", "big", "great"], "English") = msg}
       const payload = { user: user.username, text: msg };
       io.to(user.room).emit('chat message', payload);
       roomMessages[user.room].push(payload);
