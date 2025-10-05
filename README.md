@@ -1,7 +1,8 @@
-# texting-images
-stormhacks 2025
+# Project: Meteion Backend Server
 
+This is the server file for Project: Meteion.
+Produced in Javascript and deployed by Railway.
 
-server repo
+using proj-meteion.oopygoopy.tech
 
-w/ python TCP protocol
+For a more detailed exploration into Project Meteion, refer to the main repo.
