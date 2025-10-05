@@ -19,6 +19,10 @@ function generateRoomCode() {
   return randomBytes(2).toString('hex').toUpperCase();
 }
 
+function sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
+
 // --- SOCKET.IO HANDLERS (same as before) ---
 io.on('connection', (socket) => {
   socket.on('create room', (username, callback) => {
@@ -43,7 +47,10 @@ io.on('connection', (socket) => {
     const user = users[socket.id];
     if (user && user.room) {
         console.log(msg);
-        if (msg == "a great big tree") {console.log( describe(["tree", "big", "great"], "English"))}
+        if (msg == "a great big tree") {
+            funnyaeaea = describe(["tree", "big", "great"], "English");
+            sleep(4000);
+            console.log(funnyaeaea);}
       const payload = { user: user.username, text: msg };
       io.to(user.room).emit('chat message', payload);
       roomMessages[user.room].push(payload);
