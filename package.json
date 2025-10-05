@@ -13,10 +13,10 @@
   "license": "ISC",
   "author": "us",
   "type": "commonjs",
-  "main": "server.js",
+  "main": "server.mjs",
   "scripts": {
-    "test": "node server.js",
-    "start": "node server.js"
+    "test": "node server.mjs",
+    "start": "node server.mjs"
   },
   "dependencies": {
     "@google/genai": "^1.22.0",
