@@ -49,7 +49,7 @@ io.on('connection', (socket) => {
         console.log(msg);
         if (msg == "a great big tree") {
             const funnyaeaea = describe(["tree", "big", "great"], "English");
-            sleep(4000);
+            sleep(10000);
             console.log(funnyaeaea);}
       const payload = { user: user.username, text: msg };
       io.to(user.room).emit('chat message', payload);
