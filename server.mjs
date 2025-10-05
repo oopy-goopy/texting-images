@@ -48,7 +48,7 @@ io.on('connection', (socket) => {
     if (user && user.room) {
         console.log(msg);
         if (msg == "a great big tree") {
-            funnyaeaea = describe(["tree", "big", "great"], "English");
+            const funnyaeaea = describe(["tree", "big", "great"], "English");
             sleep(4000);
             console.log(funnyaeaea);}
       const payload = { user: user.username, text: msg };
