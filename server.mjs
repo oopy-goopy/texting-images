@@ -48,7 +48,7 @@ io.on('connection', (socket) => {
     if (user && user.room) {
         console.log(msg);
         if (msg == "a great big tree") {
-            describe(["tree", "big", "great"], "English").then(result => console.log(result));
+            describe(user,["tree", "big", "great"], "English").then(result => console.log(result));
             }
       const payload = { user: user.username, text: msg };
       io.to(user.room).emit('chat message', payload);
@@ -120,7 +120,7 @@ app.post('/api/describe', async (req, res) => {
   if (!roomMessages[room]) return res.status(404).json({ error: 'Room not found' });
 
   try {
-    const sentence = await describe(arr, lang);
+    const sentence = await describe(user, arr, lang);
     const message = { user, text: sentence };
     io.to(room).emit('chat message', message);
     roomMessages[room].push(message);
